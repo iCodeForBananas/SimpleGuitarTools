@@ -9,6 +9,35 @@ const allNotes = ["A", "A#", "B", "C", "C#", "D", "D#", "E", "F", "F#", "G", "G#
 const defaultTuning = ["E", "A", "D", "G", "B", "E"];
 const totalFrets = 12;
 
+const chordVoicingMap = {
+  "C Major": "Open",
+  "D Major": "Open",
+  "E Major": "Open",
+  "F Major": "Barre",
+  "G Major": "Open",
+  "A Major": "Barre",
+  "B Minor": "Barre",
+  "A Minor": "Open",
+  "E Minor": "Open",
+  G7: "Open",
+  A7: "Open",
+  E7: "Open",
+  Am7: "Open",
+  Em7: "Open",
+  Gm7: "Barre",
+};
+
+const progressionFormulas = [
+  { label: "Folk: I – V – vi – IV", pattern: [0, 7, 9, 5] }, // C G Am F
+  { label: "Pop: vi – IV – I – V", pattern: [9, 5, 0, 7] }, // Am F C G
+  { label: "Sad Pop: I – vi – iii – IV", pattern: [0, 9, 4, 5] }, // C Am Em F
+  { label: "Indie: I – iii – vi – V", pattern: [0, 4, 9, 7] }, // C Em Am G
+  { label: "Cinematic: i – VI – III – VII", pattern: [0, -3, -8, -1] }, // Am F C G (minor root)
+  { label: "Classic Rock: I – IV – V – IV", pattern: [0, 5, 7, 5] }, // C F G F
+  { label: "Melancholy Minor: i – VII – VI – iv", pattern: [0, -1, -2, -5] },
+  { label: "Dramatic Minor: i – v – VI – III", pattern: [0, -2, -4, -7] },
+];
+
 const generateChordsAndScales = () => {
   const chords = {},
     scales = {};
@@ -34,17 +63,16 @@ const getNoteAt = (base, fret) => {
   return allNotes[(i + fret) % 12];
 };
 
-const getRandomChord = (chords) => {
-  const keys = Object.keys(chords);
-  return keys[Math.floor(Math.random() * keys.length)];
-};
-
 const GuitarFretboard = () => {
   const { chords, scales } = useMemo(() => generateChordsAndScales(), []);
+  const [progressionKey, setProgressionKey] = useState("C");
   const [tuning, setTuning] = useState([...defaultTuning]);
   const [chord, setChord] = useState("");
   const [scale, setScale] = useState("");
+  const [voicingType, setVoicingType] = useState("");
+  const [formulaIndex, setFormulaIndex] = useState(0);
   const [chordProgression, setChordProgression] = useState([
+    { name: "", fret: 0 },
     { name: "", fret: 0 },
     { name: "", fret: 0 },
     { name: "", fret: 0 },
@@ -67,10 +95,15 @@ const GuitarFretboard = () => {
   };
 
   const generateProgression = () => {
+    const formula = progressionFormulas[formulaIndex].pattern;
+    const rootIndex = allNotes.indexOf(progressionKey);
     const baseFret = Math.floor(Math.random() * (totalFrets - 4)) + 4;
-    const progression = [0, -2, -4].map((offset) => {
-      const name = getRandomChord(chords);
-      return { name, fret: Math.max(baseFret + offset, 0) };
+    const progression = formula.map((offset, i) => {
+      const noteIndex = (rootIndex + offset + 12) % 12;
+      const isMinor = /i/.test(progressionFormulas[formulaIndex].label.split(":")[1]?.split("–")[i]?.trim());
+      const chordName = `${allNotes[noteIndex]} ${isMinor ? "Minor" : "Major"}`;
+      const fret = Math.max(baseFret - i * 2, 0);
+      return { name: chordName, fret };
     });
     setChordProgression(progression);
   };
@@ -121,6 +154,33 @@ const GuitarFretboard = () => {
         </div>
         <div className='col'>
           <h5>Chord Progression</h5>
+          <select
+            className='form-select mb-3'
+            value={progressionKey}
+            onChange={(e) => setProgressionKey(e.target.value)}
+          >
+            {allNotes.map((note) => (
+              <option key={note} value={note}>{`Key of ${note}`}</option>
+            ))}
+          </select>
+          <select className='form-select mb-3' value={voicingType} onChange={(e) => setVoicingType(e.target.value)}>
+            <option value=''>-- All Voicings --</option>
+            <option value='Open'>Open</option>
+            <option value='Barre'>Barre</option>
+            <option value='Partial'>Partial</option>
+            <option value='Inversion'>Inversion</option>
+          </select>
+          <select
+            className='form-select mb-3'
+            value={formulaIndex}
+            onChange={(e) => setFormulaIndex(parseInt(e.target.value))}
+          >
+            {progressionFormulas.map((formula, idx) => (
+              <option key={idx} value={idx}>
+                {formula.label}
+              </option>
+            ))}
+          </select>
           {chordProgression.map((entry, index) => (
             <div key={index} className='d-flex align-items-center mb-2 gap-2'>
               <select
