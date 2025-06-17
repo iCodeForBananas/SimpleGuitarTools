@@ -115,7 +115,6 @@ const GuitarFretboard = () => {
 
   return (
     <div className='container-fluid p-4'>
-      <h1 className='mb-4'>Guitar Fretboard</h1>
       <div className='controls row mb-3'>
         <div className='col'>
           <div className='d-flex flex-column gap-1 mb-2'>
