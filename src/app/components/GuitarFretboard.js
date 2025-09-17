@@ -38,6 +38,10 @@ const generateChordsAndScales = () => {
     scales[`${root} Pentatonic Major`] = [0, 2, 4, 7, 9].map((x) => allNotes[(i + x) % 12]);
     scales[`${root} Pentatonic Minor`] = [0, 3, 5, 7, 10].map((x) => allNotes[(i + x) % 12]);
     scales[`${root} Phrygian`] = [0, 1, 3, 5, 7, 8, 10].map((x) => allNotes[(i + x) % 12]);
+    scales[`${root} Phrygian Dominant`] = [0, 1, 4, 5, 7, 8, 10].map((x) => allNotes[(i + x) % 12]);
+    scales[`${root} Blues`] = [0, 3, 5, 6, 7, 10].map((x) => allNotes[(i + x) % 12]);
+    scales[`${root} Harmonic Minor`] = [0, 2, 3, 5, 7, 8, 11].map((x) => allNotes[(i + x) % 12]);
+    scales[`${root} Melodic Minor`] = [0, 2, 3, 5, 7, 9, 11].map((x) => allNotes[(i + x) % 12]);
   });
   return { chords, scales };
 };
