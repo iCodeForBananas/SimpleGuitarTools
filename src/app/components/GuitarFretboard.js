@@ -1,24 +1,25 @@
-"use client";
+'use client';
 
-import React, { useState, useMemo, useMemo as useReactMemo } from "react";
-import "bootstrap/dist/css/bootstrap.min.css";
-import "./fretboard.css";
+import React, { useState, useMemo, useMemo as useReactMemo } from 'react';
+import 'bootstrap/dist/css/bootstrap.min.css';
+import './fretboard.css';
 
-const allNotes = ["A", "A#", "B", "C", "C#", "D", "D#", "E", "F", "F#", "G", "G#"];
+const allNotes = ['A', 'A#', 'B', 'C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#'];
 
-const defaultTuning = ["E", "A", "D", "G", "B", "E"];
+const defaultTuning = ['E', 'A', 'D', 'G', 'B', 'E'];
 const totalFrets = 12;
 
 const progressionFormulas = [
-  { label: "Folk: I – V – vi – IV", pattern: [0, 7, 9, 5] },
-  { label: "Pop: vi – IV – I – V", pattern: [9, 5, 0, 7] },
-  { label: "Sad Pop: I – vi – iii – IV", pattern: [0, 9, 4, 5] },
-  { label: "Indie: I – iii – vi – V", pattern: [0, 4, 9, 7] },
-  { label: "Cinematic: i – VI – III – VII", pattern: [0, -3, -8, -1] },
-  { label: "Classic Rock: I – IV – V – IV", pattern: [0, 5, 7, 5] },
-  { label: "Melancholy Minor: i – VII – VI – iv", pattern: [0, -1, -2, -5] },
-  { label: "Dramatic Minor: i – v – VI – III", pattern: [0, -2, -4, -7] },
-  { label: "Spanish: i – bVII – bVI – V", pattern: [0, -1, -2, 7] },
+  { label: 'Folk: I – V – vi – IV', pattern: [0, 7, 9, 5], isMinor: false },
+  { label: 'Pop: vi – IV – I – V', pattern: [9, 5, 0, 7], isMinor: false },
+  { label: 'Sad Pop: I – vi – iii – IV', pattern: [0, 9, 4, 5], isMinor: false },
+  { label: 'Indie: I – iii – vi – V', pattern: [0, 4, 9, 7], isMinor: false },
+  { label: 'Cinematic: i – VI – III – VII', pattern: [0, 8, 3, 10], isMinor: true },
+  { label: 'Classic Rock: I – IV – V – IV', pattern: [0, 5, 7, 5], isMinor: false },
+  { label: 'Melancholy Minor: i – VII – VI – iv', pattern: [0, 10, 8, 5], isMinor: true },
+  { label: 'Dramatic Minor: i – v – VI – III', pattern: [0, 7, 8, 3], isMinor: true },
+  { label: 'Spanish: i – VII – VI – V', pattern: [0, 10, 8, 7], isMinor: true },
+  { label: 'Spanish Romantic: i – VII – VI – V', pattern: [0, 10, 8, 7], isMinor: true },
 ];
 
 const generateChordsAndScales = () => {
@@ -48,7 +49,7 @@ const generateChordsAndScales = () => {
 
 const getNoteAt = (base, fret) => {
   const i = allNotes.indexOf(base);
-  if (i < 0) return "";
+  if (i < 0) return '';
   return allNotes[(i + fret) % 12];
 };
 
@@ -58,21 +59,21 @@ const Fretboard = ({ tuning, totalFrets, chordName, chordNotes, scaleNotes = [],
   const normalizedScaleNotes = (scaleNotes || []).map((n) => n.toUpperCase());
 
   return (
-    <div className='mb-4'>
-      <div className='d-flex align-items-baseline justify-content-between mb-2'>
-        <h6 className='mb-0'>{title || chordName || "Fretboard"}</h6>
+    <div className="mb-4">
+      <div className="d-flex align-items-baseline justify-content-between mb-2">
+        <h6 className="mb-0">{title || chordName || 'Fretboard'}</h6>
       </div>
-      <div className='fretboard-wrapper overflow-auto'>
-        <div className='d-flex mb-1'>
+      <div className="fretboard-wrapper overflow-auto">
+        <div className="d-flex mb-1">
           {[...Array(totalFrets + 1).keys()].map((fret) => (
-            <div key={fret} className='fret-number text-center flex-fill' style={{ fontSize: 12, color: "#333" }}>
+            <div key={fret} className="fret-number text-center flex-fill" style={{ fontSize: 12, color: '#333' }}>
               {fret}
             </div>
           ))}
         </div>
-        <div className='fretboard d-flex' style={{ minWidth: 800 }}>
+        <div className="fretboard d-flex" style={{ minWidth: 800 }}>
           {[...Array(totalFrets + 1).keys()].map((fret) => (
-            <div key={fret} className='fret d-flex flex-column flex-fill gap-1'>
+            <div key={fret} className="fret d-flex flex-column flex-fill gap-1">
               {tuning
                 .slice()
                 .reverse()
@@ -81,9 +82,9 @@ const Fretboard = ({ tuning, totalFrets, chordName, chordNotes, scaleNotes = [],
                   const isScaleNote = normalizedScaleNotes.includes(note);
                   const isChordNote = normalizedChordNotes.includes(note);
 
-                  const classList = ["note", fret === 0 && "open", isScaleNote && "scale", isChordNote && "highlight"]
+                  const classList = ['note', fret === 0 && 'open', isScaleNote && 'scale', isChordNote && 'highlight']
                     .filter(Boolean)
-                    .join(" ");
+                    .join(' ');
 
                   return (
                     <div key={string} className={classList}>
@@ -101,16 +102,16 @@ const Fretboard = ({ tuning, totalFrets, chordName, chordNotes, scaleNotes = [],
 
 const GuitarFretboard = () => {
   const { chords, scales } = useMemo(() => generateChordsAndScales(), []);
-  const [progressionKey, setProgressionKey] = useState("C");
+  const [progressionKey, setProgressionKey] = useState('C');
   const [tuning, setTuning] = useState([...defaultTuning]);
-  const [chord, setChord] = useState("");
-  const [scale, setScale] = useState("");
+  const [chord, setChord] = useState('');
+  const [scale, setScale] = useState('');
   const [formulaIndex, setFormulaIndex] = useState(0);
   const [chordProgression, setChordProgression] = useState([
-    { name: "", fret: 0 },
-    { name: "", fret: 0 },
-    { name: "", fret: 0 },
-    { name: "", fret: 0 },
+    { name: '', fret: 0 },
+    { name: '', fret: 0 },
+    { name: '', fret: 0 },
+    { name: '', fret: 0 },
   ]);
 
   const updateTuning = (index, value) => {
@@ -121,24 +122,45 @@ const GuitarFretboard = () => {
 
   const updateChordInProgression = (index, field, value) => {
     const updated = [...chordProgression];
-    updated[index] = { ...updated[index], [field]: field === "fret" ? parseInt(value, 10) || 0 : value };
+    updated[index] = { ...updated[index], [field]: field === 'fret' ? parseInt(value, 10) || 0 : value };
     setChordProgression(updated);
   };
 
   const resetTuning = () => setTuning([...defaultTuning]);
 
   const generateProgression = () => {
-    const formula = progressionFormulas[formulaIndex].pattern;
+    const formula = progressionFormulas[formulaIndex];
     const rootIndex = allNotes.indexOf(progressionKey);
-    const minorish = /(^|\s)i/.test(progressionFormulas[formulaIndex].label);
+    const isMinorProgression = formula.isMinor;
 
-    const progression = formula.map((offset, i) => {
-      const noteIndex = (rootIndex + offset + 12) % 12;
-      const isMinorDegree = /i/.test(
-        progressionFormulas[formulaIndex].label.split(":")[1]?.split("–")[i]?.trim() || ""
-      );
-      const useMinor = minorish && isMinorDegree;
-      const chordName = `${allNotes[noteIndex]} ${useMinor ? "Minor" : "Major"}`;
+    // Define chord qualities for major and minor keys
+    const majorKeyQualities = ['Major', 'Minor', 'Minor', 'Major', 'Major', 'Minor', 'Minor']; // I ii iii IV V vi vii°
+    const minorKeyQualities = ['Minor', 'Minor', 'Major', 'Minor', 'Minor', 'Major', 'Major']; // i ii° III iv v VI VII
+
+    const progression = formula.pattern.map((semitoneOffset) => {
+      const noteIndex = (rootIndex + semitoneOffset) % 12;
+      const noteName = allNotes[noteIndex];
+
+      // Determine chord quality based on scale degree
+      let chordQuality;
+      if (isMinorProgression) {
+        // For minor progressions, use context-appropriate qualities
+        // This is a simplified approach - in practice, you'd map each semitone offset to its scale degree
+        if (semitoneOffset === 0) chordQuality = 'Minor'; // i
+        else if (semitoneOffset === 3) chordQuality = 'Major'; // III
+        else if (semitoneOffset === 5) chordQuality = 'Minor'; // iv
+        else if (semitoneOffset === 7) chordQuality = 'Major'; // V (often major in minor keys)
+        else if (semitoneOffset === 8) chordQuality = 'Major'; // VI
+        else if (semitoneOffset === 10) chordQuality = 'Major'; // VII
+        else chordQuality = 'Major'; // default
+      } else {
+        // For major progressions, determine quality based on scale degree
+        const scaleDegree = semitoneOffset % 12;
+        if ([0, 5, 7].includes(scaleDegree)) chordQuality = 'Major'; // I, IV, V
+        else chordQuality = 'Minor'; // ii, iii, vi
+      }
+
+      const chordName = `${noteName} ${chordQuality}`;
       return { name: chordName, fret: 0 };
     });
     setChordProgression(progression);
@@ -147,29 +169,29 @@ const GuitarFretboard = () => {
   const chordOptions = useReactMemo(
     () =>
       Object.entries(chords).map(([name, notes]) => (
-        <option key={name} value={name}>{`${name} [${notes.join(", ")}]`}</option>
+        <option key={name} value={name}>{`${name} [${notes.join(', ')}]`}</option>
       )),
-    [chords]
+    [chords],
   );
 
   const scaleOptions = useReactMemo(
     () =>
       Object.entries(scales).map(([name, notes]) => (
-        <option key={name} value={name}>{`${name} [${notes.join(", ")}]`}</option>
+        <option key={name} value={name}>{`${name} [${notes.join(', ')}]`}</option>
       )),
-    [scales]
+    [scales],
   );
 
   return (
-    <div className='container-fluid p-4'>
-      <div className='controls row mb-3'>
-        <div className='col'>
-          <div className='d-flex flex-column gap-1 mb-2'>
+    <div className="container-fluid p-4">
+      <div className="controls row mb-3">
+        <div className="col">
+          <div className="d-flex flex-column gap-1 mb-2">
             {tuning.map((note, i) => (
               <select
                 id={`tun-${i}`}
                 key={i}
-                className='form-select form-select-sm'
+                className="form-select form-select-sm"
                 value={note}
                 onChange={(e) => updateTuning(i, e.target.value)}
               >
@@ -181,26 +203,26 @@ const GuitarFretboard = () => {
               </select>
             ))}
           </div>
-          <button className='btn btn-outline-dark' onClick={resetTuning}>
+          <button className="btn btn-outline-dark" onClick={resetTuning}>
             Reset Tuning
           </button>
         </div>
 
-        <div className='col'>
-          <select className='form-select mb-3' value={chord} onChange={(e) => setChord(e.target.value)}>
-            <option value=''>-- Select Chord --</option>
+        <div className="col">
+          <select className="form-select mb-3" value={chord} onChange={(e) => setChord(e.target.value)}>
+            <option value="">-- Select Chord --</option>
             {chordOptions}
           </select>
-          <select className='form-select mb-3' value={scale} onChange={(e) => setScale(e.target.value)}>
-            <option value=''>-- Select Scale --</option>
+          <select className="form-select mb-3" value={scale} onChange={(e) => setScale(e.target.value)}>
+            <option value="">-- Select Scale --</option>
             {scaleOptions}
           </select>
         </div>
 
-        <div className='col'>
+        <div className="col">
           <h5>Chord Progression</h5>
           <select
-            className='form-select mb-3'
+            className="form-select mb-3"
             value={progressionKey}
             onChange={(e) => setProgressionKey(e.target.value)}
           >
@@ -209,7 +231,7 @@ const GuitarFretboard = () => {
             ))}
           </select>
           <select
-            className='form-select mb-3'
+            className="form-select mb-3"
             value={formulaIndex}
             onChange={(e) => setFormulaIndex(parseInt(e.target.value, 10))}
           >
@@ -220,18 +242,18 @@ const GuitarFretboard = () => {
             ))}
           </select>
           {chordProgression.map((entry, index) => (
-            <div key={index} className='d-flex align-items-center mb-2 gap-2'>
+            <div key={index} className="d-flex align-items-center mb-2 gap-2">
               <select
-                className='form-select form-select-sm'
+                className="form-select form-select-sm"
                 value={entry.name}
-                onChange={(e) => updateChordInProgression(index, "name", e.target.value)}
+                onChange={(e) => updateChordInProgression(index, 'name', e.target.value)}
               >
-                <option value=''>{`-- Select Chord ${index + 1} --`}</option>
+                <option value="">{`-- Select Chord ${index + 1} --`}</option>
                 {chordOptions}
               </select>
             </div>
           ))}
-          <button className='btn btn-secondary btn-sm mt-2' onClick={generateProgression}>
+          <button className="btn btn-secondary btn-sm mt-2" onClick={generateProgression}>
             Generate Random Progression
           </button>
         </div>
@@ -243,11 +265,11 @@ const GuitarFretboard = () => {
         chordName={chord}
         chordNotes={chord ? chords[chord] : []}
         scaleNotes={scale ? scales[scale] : []}
-        title={`Preview: ${chord || "(choose a chord)"}`}
+        title={`Preview: ${chord || '(choose a chord)'}`}
       />
 
-      <div className='mt-4'>
-        <h5 className='mb-3'>Progression Boards</h5>
+      <div className="mt-4">
+        <h5 className="mb-3">Progression Boards</h5>
         {chordProgression.map((entry, i) => (
           <Fretboard
             key={`${entry.name}-${i}`}
@@ -256,7 +278,7 @@ const GuitarFretboard = () => {
             chordName={entry.name}
             chordNotes={entry.name ? chords[entry.name] : []}
             scaleNotes={scale ? scales[scale] : []}
-            title={`Chord ${i + 1}: ${entry.name || "(unset)"}`}
+            title={`Chord ${i + 1}: ${entry.name || '(unset)'}`}
           />
         ))}
       </div>

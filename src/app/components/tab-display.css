@@ -1,0 +1,193 @@
+/* Tab Display Component Styles */
+
+.tab-display {
+  margin: 20px 0;
+  padding: 15px;
+  border: 1px solid #dee2e6;
+  border-radius: 8px;
+  background-color: #ffffff;
+  font-family: 'Courier New', monospace;
+}
+
+.tab-display.dark {
+  background-color: #2d2d2d;
+  border-color: #404040;
+  color: #ffffff;
+}
+
+.tab-title {
+  margin-bottom: 15px;
+  font-weight: bold;
+  color: #333;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+.tab-display.dark .tab-title {
+  color: #ffffff;
+}
+
+.tab-placeholder {
+  text-align: center;
+  padding: 40px 20px;
+  color: #6c757d;
+  font-style: italic;
+}
+
+.tab-display.dark .tab-placeholder {
+  color: #b0b0b0;
+}
+
+.tab-phrase {
+  margin-bottom: 30px;
+}
+
+.phrase-header {
+  margin-bottom: 10px;
+  font-size: 14px;
+  color: #495057;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+.tab-display.dark .phrase-header {
+  color: #ffffff;
+}
+
+.tab-staff {
+  display: flex;
+  align-items: stretch;
+  background-color: #fafafa;
+  border: 1px solid #e9ecef;
+  border-radius: 4px;
+  padding: 10px;
+  overflow-x: auto;
+  min-width: 300px;
+}
+
+.tab-display.dark .tab-staff {
+  background-color: #1a1a1a;
+  border-color: #404040;
+}
+
+.string-labels {
+  display: flex;
+  flex-direction: column;
+  margin-right: 15px;
+  justify-content: space-between;
+  min-height: 120px;
+}
+
+.string-label {
+  font-weight: bold;
+  font-size: 12px;
+  color: #495057;
+  text-align: center;
+  line-height: 20px;
+  width: 20px;
+}
+
+.tab-display.dark .string-label {
+  color: #ffffff;
+}
+
+.tab-lines {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  min-height: 120px;
+}
+
+.tab-line {
+  position: relative;
+  height: 20px;
+  display: flex;
+  align-items: center;
+}
+
+.line-border {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background-color: #333;
+  transform: translateY(-50%);
+}
+
+.tab-display.dark .line-border {
+  background-color: #ffffff;
+}
+
+.fret-numbers {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  gap: 20px;
+  align-items: center;
+  height: 100%;
+}
+
+.fret-number {
+  background-color: #ffffff;
+  color: #333;
+  font-weight: bold;
+  font-size: 12px;
+  padding: 2px 4px;
+  border-radius: 2px;
+  min-width: 16px;
+  text-align: center;
+  border: 1px solid #dee2e6;
+}
+
+.tab-display.dark .fret-number {
+  background-color: #2d2d2d;
+  color: #ffffff;
+  border-color: #404040;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .tab-staff {
+    padding: 8px;
+  }
+
+  .string-labels {
+    margin-right: 10px;
+    min-height: 100px;
+  }
+
+  .tab-lines {
+    min-height: 100px;
+  }
+
+  .tab-line {
+    height: 16px;
+  }
+
+  .fret-numbers {
+    gap: 15px;
+  }
+
+  .fret-number {
+    font-size: 11px;
+    padding: 1px 3px;
+  }
+}
+
+/* High contrast mode for accessibility */
+@media (prefers-contrast: high) {
+  .line-border {
+    background-color: #000;
+    height: 2px;
+  }
+
+  .tab-display.dark .line-border {
+    background-color: #fff;
+    height: 2px;
+  }
+
+  .fret-number {
+    border-width: 2px;
+    font-weight: 900;
+  }
+}
