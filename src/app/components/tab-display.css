@@ -3,38 +3,28 @@
 .tab-display {
   margin: 20px 0;
   padding: 15px;
-  border: 1px solid #dee2e6;
+  border: 1px solid var(--border-color);
   border-radius: 8px;
-  background-color: #ffffff;
+  background-color: var(--bg-primary);
   font-family: 'Courier New', monospace;
-}
-
-.tab-display.dark {
-  background-color: #2d2d2d;
-  border-color: #404040;
-  color: #ffffff;
+  color: var(--text-primary);
+  transition: all 0.3s ease;
 }
 
 .tab-title {
   margin-bottom: 15px;
   font-weight: bold;
-  color: #333;
+  color: var(--text-primary);
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-}
-
-.tab-display.dark .tab-title {
-  color: #ffffff;
+  transition: color 0.3s ease;
 }
 
 .tab-placeholder {
   text-align: center;
   padding: 40px 20px;
-  color: #6c757d;
+  color: var(--text-secondary);
   font-style: italic;
-}
-
-.tab-display.dark .tab-placeholder {
-  color: #b0b0b0;
+  transition: color 0.3s ease;
 }
 
 .tab-phrase {
@@ -44,28 +34,21 @@
 .phrase-header {
   margin-bottom: 10px;
   font-size: 14px;
-  color: #495057;
+  color: var(--text-primary);
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-}
-
-.tab-display.dark .phrase-header {
-  color: #ffffff;
+  transition: color 0.3s ease;
 }
 
 .tab-staff {
   display: flex;
   align-items: stretch;
-  background-color: #fafafa;
-  border: 1px solid #e9ecef;
+  background-color: var(--bg-secondary);
+  border: 1px solid var(--border-color);
   border-radius: 4px;
   padding: 10px;
   overflow-x: auto;
   min-width: 300px;
-}
-
-.tab-display.dark .tab-staff {
-  background-color: #1a1a1a;
-  border-color: #404040;
+  transition: all 0.3s ease;
 }
 
 .string-labels {
@@ -79,14 +62,11 @@
 .string-label {
   font-weight: bold;
   font-size: 12px;
-  color: #495057;
+  color: var(--text-primary);
   text-align: center;
   line-height: 20px;
   width: 20px;
-}
-
-.tab-display.dark .string-label {
-  color: #ffffff;
+  transition: color 0.3s ease;
 }
 
 .tab-lines {
@@ -110,12 +90,9 @@
   left: 0;
   right: 0;
   height: 1px;
-  background-color: #333;
+  background-color: var(--text-primary);
   transform: translateY(-50%);
-}
-
-.tab-display.dark .line-border {
-  background-color: #ffffff;
+  transition: background-color 0.3s ease;
 }
 
 .fret-numbers {
@@ -128,21 +105,16 @@
 }
 
 .fret-number {
-  background-color: #ffffff;
-  color: #333;
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
   font-weight: bold;
   font-size: 12px;
   padding: 2px 4px;
   border-radius: 2px;
   min-width: 16px;
   text-align: center;
-  border: 1px solid #dee2e6;
-}
-
-.tab-display.dark .fret-number {
-  background-color: #2d2d2d;
-  color: #ffffff;
-  border-color: #404040;
+  border: 1px solid var(--border-color);
+  transition: all 0.3s ease;
 }
 
 /* Responsive design */
@@ -177,12 +149,7 @@
 /* High contrast mode for accessibility */
 @media (prefers-contrast: high) {
   .line-border {
-    background-color: #000;
-    height: 2px;
-  }
-
-  .tab-display.dark .line-border {
-    background-color: #fff;
+    background-color: var(--text-primary);
     height: 2px;
   }
 

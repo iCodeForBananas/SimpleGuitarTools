@@ -3,6 +3,9 @@
 import React, { useState, useMemo, useMemo as useReactMemo } from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './fretboard.css';
+import { useTheme } from '../contexts/ThemeContext';
+import TabGenerator from '../utils/TabGenerator';
+import TabDisplay from './TabDisplay';
 
 const allNotes = ['A', 'A#', 'B', 'C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#'];
 
@@ -54,7 +57,7 @@ const getNoteAt = (base, fret) => {
 };
 
 /** Single-fretboard renderer for a given chord name showing all positions */
-const Fretboard = ({ tuning, totalFrets, chordName, chordNotes, scaleNotes = [], title }) => {
+const Fretboard = ({ tuning, totalFrets, chordName, chordNotes, scaleNotes = [], title, theme }) => {
   const normalizedChordNotes = (chordNotes || []).map((n) => n.toUpperCase());
   const normalizedScaleNotes = (scaleNotes || []).map((n) => n.toUpperCase());
 
@@ -101,6 +104,7 @@ const Fretboard = ({ tuning, totalFrets, chordName, chordNotes, scaleNotes = [],
 };
 
 const GuitarFretboard = () => {
+  const { theme, toggleTheme, mounted } = useTheme();
   const { chords, scales } = useMemo(() => generateChordsAndScales(), []);
   const [progressionKey, setProgressionKey] = useState('C');
   const [tuning, setTuning] = useState([...defaultTuning]);
@@ -113,6 +117,10 @@ const GuitarFretboard = () => {
     { name: '', fret: 0 },
     { name: '', fret: 0 },
   ]);
+  const [generatedTabs, setGeneratedTabs] = useState([]);
+
+  // Initialize TabGenerator
+  const tabGenerator = useMemo(() => new TabGenerator(), []);
 
   const updateTuning = (index, value) => {
     const newTuning = [...tuning];
@@ -127,6 +135,27 @@ const GuitarFretboard = () => {
   };
 
   const resetTuning = () => setTuning([...defaultTuning]);
+
+  const resetToDefaults = () => {
+    // Reset tuning to standard
+    setTuning([...defaultTuning]);
+    // Clear chord and scale selections
+    setChord('');
+    setScale('');
+    // Reset progression key to C
+    setProgressionKey('C');
+    // Reset formula index to first option
+    setFormulaIndex(0);
+    // Clear chord progression selections
+    setChordProgression([
+      { name: '', fret: 0 },
+      { name: '', fret: 0 },
+      { name: '', fret: 0 },
+      { name: '', fret: 0 },
+    ]);
+    // Clear generated tabs
+    setGeneratedTabs([]);
+  };
 
   const generateProgression = () => {
     const formula = progressionFormulas[formulaIndex];
@@ -166,6 +195,31 @@ const GuitarFretboard = () => {
     setChordProgression(progression);
   };
 
+  const generateTabs = () => {
+    // Only generate tabs if we have a chord progression and scale
+    const validChords = chordProgression.filter((chord) => chord.name && chords[chord.name]);
+    if (validChords.length === 0 || !scale || !scales[scale]) {
+      setGeneratedTabs([]);
+      return;
+    }
+
+    // Prepare chord progression data for TabGenerator
+    const progressionData = validChords.map((chord) => ({
+      name: chord.name,
+      notes: chords[chord.name],
+    }));
+
+    // Generate phrases using TabGenerator
+    const phrases = tabGenerator.generateProgressionPhrases(progressionData, scales[scale], tuning, {
+      phraseLength: 6,
+      preferredPosition: 5,
+      emphasizeChordTones: true,
+      positionRange: 4,
+    });
+
+    setGeneratedTabs(phrases);
+  };
+
   const chordOptions = useReactMemo(
     () =>
       Object.entries(chords).map(([name, notes]) => (
@@ -182,10 +236,27 @@ const GuitarFretboard = () => {
     [scales],
   );
 
+  // Don't render until theme is mounted to prevent hydration mismatch
+  if (!mounted) {
+    return <div className="container-fluid p-4">Loading...</div>;
+  }
+
   return (
     <div className="container-fluid p-4">
+      <div className="d-flex justify-content-between align-items-center mb-3">
+        <h2>Guitar Fretboard Tool</h2>
+        <button
+          className={`btn ${theme === 'light' ? 'btn-dark' : 'btn-light'}`}
+          onClick={toggleTheme}
+          title={`Switch to ${theme === 'light' ? 'dark' : 'light'} mode`}
+        >
+          {theme === 'light' ? '🌙' : '☀️'} {theme === 'light' ? 'Dark' : 'Light'} Mode
+        </button>
+      </div>
+
       <div className="controls row mb-3">
         <div className="col">
+          <h5>Tuning</h5>
           <div className="d-flex flex-column gap-1 mb-2">
             {tuning.map((note, i) => (
               <select
@@ -203,12 +274,16 @@ const GuitarFretboard = () => {
               </select>
             ))}
           </div>
-          <button className="btn btn-outline-dark" onClick={resetTuning}>
+          <button
+            className={`btn ${theme === 'light' ? 'btn-outline-dark' : 'btn-outline-light'}`}
+            onClick={resetTuning}
+          >
             Reset Tuning
           </button>
         </div>
 
         <div className="col">
+          <h5>Chords & Scales</h5>
           <select className="form-select mb-3" value={chord} onChange={(e) => setChord(e.target.value)}>
             <option value="">-- Select Chord --</option>
             {chordOptions}
@@ -256,6 +331,21 @@ const GuitarFretboard = () => {
           <button className="btn btn-secondary btn-sm mt-2" onClick={generateProgression}>
             Generate Random Progression
           </button>
+          <button
+            className="btn btn-primary btn-sm mt-2"
+            onClick={generateTabs}
+            disabled={!scale || chordProgression.every((chord) => !chord.name)}
+            title="Generate musical phrases for the chord progression"
+          >
+            Generate Tabs
+          </button>
+          <button
+            className={`btn ${theme === 'light' ? 'btn-outline-danger' : 'btn-outline-light'} btn-sm mt-2`}
+            onClick={resetToDefaults}
+            title="Reset all selections to default values"
+          >
+            Reset All
+          </button>
         </div>
       </div>
 
@@ -266,6 +356,7 @@ const GuitarFretboard = () => {
         chordNotes={chord ? chords[chord] : []}
         scaleNotes={scale ? scales[scale] : []}
         title={`Preview: ${chord || '(choose a chord)'}`}
+        theme={theme}
       />
 
       <div className="mt-4">
@@ -279,9 +370,17 @@ const GuitarFretboard = () => {
             chordNotes={entry.name ? chords[entry.name] : []}
             scaleNotes={scale ? scales[scale] : []}
             title={`Chord ${i + 1}: ${entry.name || '(unset)'}`}
+            theme={theme}
           />
         ))}
       </div>
+
+      {generatedTabs.length > 0 && (
+        <div className="mt-4">
+          <h5 className="mb-3">Generated Musical Phrases</h5>
+          <TabDisplay phrases={generatedTabs} tuning={tuning} />
+        </div>
+      )}
     </div>
   );
 };

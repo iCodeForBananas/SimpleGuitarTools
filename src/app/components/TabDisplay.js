@@ -2,6 +2,7 @@
 
 import React from 'react';
 import './tab-display.css';
+import { useTheme } from '../contexts/ThemeContext';
 
 /**
  * TabNote interface represents a single note in guitar tablature
@@ -25,12 +26,12 @@ import './tab-display.css';
  * @param {Object} props
  * @param {TabPhrase[]} props.phrases - Array of musical phrases to display
  * @param {string[]} props.tuning - Guitar tuning (high E to low E)
- * @param {'light'|'dark'} [props.theme='light'] - Theme for styling
  */
-const TabDisplay = ({ phrases = [], tuning = ['E', 'B', 'G', 'D', 'A', 'E'], theme = 'light' }) => {
+const TabDisplay = ({ phrases = [], tuning = ['E', 'B', 'G', 'D', 'A', 'E'] }) => {
+  const { theme } = useTheme();
   if (!phrases || phrases.length === 0) {
     return (
-      <div className={`tab-display ${theme}`}>
+      <div className="tab-display">
         <div className="tab-placeholder">
           <p>No tablature to display. Generate phrases to see guitar tabs here.</p>
         </div>
@@ -39,7 +40,7 @@ const TabDisplay = ({ phrases = [], tuning = ['E', 'B', 'G', 'D', 'A', 'E'], the
   }
 
   return (
-    <div className={`tab-display ${theme}`}>
+    <div className="tab-display">
       <h6 className="tab-title">Guitar Tablature</h6>
 
       {phrases.map((phrase, phraseIndex) => (

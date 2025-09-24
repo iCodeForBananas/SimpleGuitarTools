@@ -127,8 +127,21 @@ The Guitar Fretboard Tool is a web-based application designed to help guitarists
 #### Acceptance Criteria
 
 1. WHEN a chord progression and scale are selected THEN the system SHALL provide an option to generate musical phrases for each chord
-2. WHEN musical phrase generation is triggered THEN the system SHALL create short melodic patterns (4-8 notes) that fit the selected scale and emphasize chord tones
-3. WHEN musical phrases are generated THEN the system SHALL display them in standard guitar tablature format showing fret numbers on string lines
-4. WHEN displaying guitar tabs THEN the system SHALL use proper tab notation with six horizontal lines representing guitar strings (high E to low E)
+2. WHEN musical phrase generation is triggered THEN the system SHALL create melodic patterns that fit the selected scale and emphasize chord tones
+3. WHEN musical phrases are generated THEN the system SHALL display them in standard guitar tablature format positioned between each chord fretboard display
+4. WHEN displaying guitar tabs THEN the system SHALL use proper tab notation with six horizontal lines representing guitar strings (high E to low E from top to bottom)
 5. WHEN multiple chords are in progression THEN the system SHALL generate complementary phrases that flow musically between chord changes
-6. WHEN phrases are generated THEN the system SHALL prioritize notes within easy reach (same fretboard position) for playability
+6. WHEN phrases are generated THEN the system SHALL follow melodic patterns similar to ascending/descending scale runs and arpeggiated sequences
+7. WHEN tab notation is displayed THEN the system SHALL show fret numbers positioned on the appropriate string lines in a monospace font format
+8. WHEN chord progression is active THEN the system SHALL position each generated tab phrase directly between consecutive chord fretboard displays for easy visual reference
+
+### Requirement 12: Clean Live Interface
+
+**User Story:** As a user, I want a clean interface with only live functionality, so that I can focus on the interactive features without distracting demo content.
+
+#### Acceptance Criteria
+
+1. WHEN the application loads THEN the system SHALL display only interactive controls and live fretboard displays
+2. WHEN the interface is rendered THEN the system SHALL exclude any static demo content, placeholder text, or non-functional elements
+3. WHEN users interact with controls THEN the system SHALL provide immediate live updates to fretboard displays and musical content
+4. WHEN the application is in use THEN the system SHALL maintain focus on functional tools for chord visualization, scale exploration, and musical phrase generation

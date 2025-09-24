@@ -2,6 +2,15 @@ import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import GuitarFretboard from '../GuitarFretboard';
+import { ThemeProvider } from '../../contexts/ThemeContext';
+
+// Test wrapper component
+const TestWrapper = ({ children }) => <ThemeProvider>{children}</ThemeProvider>;
+
+// Helper function to render with theme provider
+const renderWithTheme = (component) => {
+  return render(component, { wrapper: TestWrapper });
+};
 
 // Mock the music theory engine functions for testing
 const allNotes = ['A', 'A#', 'B', 'C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#'];
@@ -154,7 +163,7 @@ describe('GuitarFretboard Music Theory Engine', () => {
 
 describe('GuitarFretboard Component Integration', () => {
   test('should render Spanish Romantic progression option', () => {
-    render(<GuitarFretboard />);
+    renderWithTheme(<GuitarFretboard />);
 
     const progressionSelect = screen.getByDisplayValue('Folk: I – V – vi – IV');
     fireEvent.click(progressionSelect);
@@ -163,7 +172,7 @@ describe('GuitarFretboard Component Integration', () => {
   });
 
   test('should generate Spanish Romantic progression when selected', () => {
-    render(<GuitarFretboard />);
+    renderWithTheme(<GuitarFretboard />);
 
     // Select Spanish Romantic progression
     const progressionSelect = screen.getByDisplayValue('Folk: I – V – vi – IV');
@@ -176,5 +185,175 @@ describe('GuitarFretboard Component Integration', () => {
     // Check that chord selectors are populated (we can't easily test the exact values without more complex setup)
     const chordSelectors = screen.getAllByText(/-- Select Chord \d --/);
     expect(chordSelectors).toHaveLength(4);
+  });
+});
+describe('Reset Functionality', () => {
+  test('should render Reset All button', () => {
+    renderWithTheme(<GuitarFretboard />);
+
+    const resetButton = screen.getByText('Reset All');
+    expect(resetButton).toBeInTheDocument();
+    expect(resetButton).toHaveAttribute('title', 'Reset all selections to default values');
+  });
+
+  test('should reset tuning to standard when Reset All is clicked', () => {
+    renderWithTheme(<GuitarFretboard />);
+
+    // Change tuning from standard
+    const firstTuningSelect = screen.getAllByDisplayValue('E')[0]; // First string (low E)
+    fireEvent.change(firstTuningSelect, { target: { value: 'D' } });
+
+    // Verify tuning changed
+    expect(screen.getAllByDisplayValue('D')).toHaveLength(2); // D string and the changed one
+
+    // Click Reset All
+    const resetButton = screen.getByText('Reset All');
+    fireEvent.click(resetButton);
+
+    // Verify tuning is back to standard (E-A-D-G-B-E)
+    const tuningSelects = screen.getAllByRole('combobox').slice(0, 6); // First 6 are tuning selects
+    expect(tuningSelects[0]).toHaveValue('E'); // Low E
+    expect(tuningSelects[1]).toHaveValue('A'); // A
+    expect(tuningSelects[2]).toHaveValue('D'); // D
+    expect(tuningSelects[3]).toHaveValue('G'); // G
+    expect(tuningSelects[4]).toHaveValue('B'); // B
+    expect(tuningSelects[5]).toHaveValue('E'); // High E
+  });
+
+  test('should clear chord selection when Reset All is clicked', () => {
+    renderWithTheme(<GuitarFretboard />);
+
+    // Select a chord
+    const chordSelect = screen.getByDisplayValue('-- Select Chord --');
+    fireEvent.change(chordSelect, { target: { value: 'C Major' } });
+
+    // Verify chord is selected
+    expect(chordSelect).toHaveValue('C Major');
+
+    // Click Reset All
+    const resetButton = screen.getByText('Reset All');
+    fireEvent.click(resetButton);
+
+    // Verify chord selection is cleared
+    expect(chordSelect).toHaveValue('');
+  });
+
+  test('should clear scale selection when Reset All is clicked', () => {
+    renderWithTheme(<GuitarFretboard />);
+
+    // Select a scale
+    const scaleSelect = screen.getByDisplayValue('-- Select Scale --');
+    fireEvent.change(scaleSelect, { target: { value: 'C Major' } });
+
+    // Verify scale is selected
+    expect(scaleSelect).toHaveValue('C Major');
+
+    // Click Reset All
+    const resetButton = screen.getByText('Reset All');
+    fireEvent.click(resetButton);
+
+    // Verify scale selection is cleared
+    expect(scaleSelect).toHaveValue('');
+  });
+
+  test('should reset progression key to C when Reset All is clicked', () => {
+    renderWithTheme(<GuitarFretboard />);
+
+    // Change progression key from C
+    const keySelect = screen.getByDisplayValue('Key of C');
+    fireEvent.change(keySelect, { target: { value: 'G' } });
+
+    // Verify key changed
+    expect(keySelect).toHaveValue('G');
+
+    // Click Reset All
+    const resetButton = screen.getByText('Reset All');
+    fireEvent.click(resetButton);
+
+    // Verify key is back to C
+    expect(keySelect).toHaveValue('C');
+  });
+
+  test('should reset progression formula to first option when Reset All is clicked', () => {
+    renderWithTheme(<GuitarFretboard />);
+
+    // Change progression formula from Folk
+    const formulaSelect = screen.getByDisplayValue('Folk: I – V – vi – IV');
+    fireEvent.change(formulaSelect, { target: { value: '2' } }); // Sad Pop
+
+    // Verify formula changed
+    expect(formulaSelect).toHaveValue('2');
+
+    // Click Reset All
+    const resetButton = screen.getByText('Reset All');
+    fireEvent.click(resetButton);
+
+    // Verify formula is back to first option (Folk)
+    expect(formulaSelect).toHaveValue('0');
+  });
+
+  test('should clear all chord progression selections when Reset All is clicked', () => {
+    renderWithTheme(<GuitarFretboard />);
+
+    // Generate a progression first
+    const generateButton = screen.getByText('Generate Random Progression');
+    fireEvent.click(generateButton);
+
+    // Manually select a chord in one of the progression slots
+    const chordProgressionSelects = screen.getAllByText(/-- Select Chord \d --/);
+    const firstProgressionSelect = chordProgressionSelects[0].closest('select');
+    fireEvent.change(firstProgressionSelect, { target: { value: 'C Major' } });
+
+    // Verify chord is selected in progression
+    expect(firstProgressionSelect).toHaveValue('C Major');
+
+    // Click Reset All
+    const resetButton = screen.getByText('Reset All');
+    fireEvent.click(resetButton);
+
+    // Verify all progression chord selections are cleared
+    const resetProgressionSelects = screen.getAllByText(/-- Select Chord \d --/);
+    resetProgressionSelects.forEach((option) => {
+      const select = option.closest('select');
+      expect(select).toHaveValue('');
+    });
+  });
+
+  test('should reset all selections simultaneously', () => {
+    renderWithTheme(<GuitarFretboard />);
+
+    // Make multiple changes
+    const firstTuningSelect = screen.getAllByDisplayValue('E')[0];
+    fireEvent.change(firstTuningSelect, { target: { value: 'D' } });
+
+    const chordSelect = screen.getByDisplayValue('-- Select Chord --');
+    fireEvent.change(chordSelect, { target: { value: 'G Major' } });
+
+    const scaleSelect = screen.getByDisplayValue('-- Select Scale --');
+    fireEvent.change(scaleSelect, { target: { value: 'A Minor' } });
+
+    const keySelect = screen.getByDisplayValue('Key of C');
+    fireEvent.change(keySelect, { target: { value: 'F' } });
+
+    const formulaSelect = screen.getByDisplayValue('Folk: I – V – vi – IV');
+    fireEvent.change(formulaSelect, { target: { value: '3' } });
+
+    // Verify all changes were made
+    expect(firstTuningSelect).toHaveValue('D');
+    expect(chordSelect).toHaveValue('G Major');
+    expect(scaleSelect).toHaveValue('A Minor');
+    expect(keySelect).toHaveValue('F');
+    expect(formulaSelect).toHaveValue('3');
+
+    // Click Reset All
+    const resetButton = screen.getByText('Reset All');
+    fireEvent.click(resetButton);
+
+    // Verify everything is reset to defaults
+    expect(firstTuningSelect).toHaveValue('E');
+    expect(chordSelect).toHaveValue('');
+    expect(scaleSelect).toHaveValue('');
+    expect(keySelect).toHaveValue('C');
+    expect(formulaSelect).toHaveValue('0');
   });
 });
