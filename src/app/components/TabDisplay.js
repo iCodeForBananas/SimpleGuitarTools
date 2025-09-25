@@ -17,21 +17,31 @@ import { useTheme } from '../contexts/ThemeContext';
  * @typedef {Object} TabPhrase
  * @property {string} chordName - Name of the chord this phrase is for
  * @property {TabNote[]} notes - Array of notes in the phrase
+ * @property {'ascending-run' | 'descending-run' | 'arpeggiated' | 'mixed'} pattern - Pattern type for the phrase
  */
 
 /**
  * TabDisplay component renders guitar tablature notation
  * Displays 6 horizontal lines representing guitar strings with fret numbers
+ * Supports positioning between chord fretboards or as standalone display
  *
  * @param {Object} props
- * @param {TabPhrase[]} props.phrases - Array of musical phrases to display
+ * @param {TabPhrase} props.phrase - Single musical phrase to display
  * @param {string[]} props.tuning - Guitar tuning (high E to low E)
+ * @param {'between-chords' | 'standalone'} props.position - Display positioning mode
+ * @param {string} [props.title] - Optional title for the tab display
  */
-const TabDisplay = ({ phrases = [], tuning = ['E', 'B', 'G', 'D', 'A', 'E'] }) => {
+const TabDisplay = ({
+  phrase = null,
+  tuning = ['E', 'B', 'G', 'D', 'A', 'E'],
+  position = 'standalone',
+  title = null,
+}) => {
   const { theme } = useTheme();
-  if (!phrases || phrases.length === 0) {
+
+  if (!phrase || !phrase.notes || phrase.notes.length === 0) {
     return (
-      <div className="tab-display">
+      <div className={`tab-display tab-display--${position}`}>
         <div className="tab-placeholder">
           <p>No tablature to display. Generate phrases to see guitar tabs here.</p>
         </div>
@@ -39,46 +49,70 @@ const TabDisplay = ({ phrases = [], tuning = ['E', 'B', 'G', 'D', 'A', 'E'] }) =
     );
   }
 
-  return (
-    <div className="tab-display">
-      <h6 className="tab-title">Guitar Tablature</h6>
+  // Get pattern description for display
+  const getPatternDescription = (pattern) => {
+    const descriptions = {
+      'ascending-run': 'Ascending Run',
+      'descending-run': 'Descending Run',
+      'arpeggiated': 'Arpeggiated',
+      'mixed': 'Mixed Pattern',
+    };
+    return descriptions[pattern] || 'Musical Phrase';
+  };
 
-      {phrases.map((phrase, phraseIndex) => (
-        <div key={phraseIndex} className="tab-phrase">
-          <div className="phrase-header">
-            <strong>{phrase.chordName}</strong>
+  return (
+    <div className={`tab-display tab-display--${position}`}>
+      {/* Title display - different for each position mode */}
+      {position === 'standalone' && <h6 className="tab-title">{title || 'Guitar Tablature'}</h6>}
+
+      {position === 'between-chords' && (
+        <div className="tab-connector">
+          <div className="connector-line"></div>
+          <span className="connector-label">
+            {phrase.pattern ? getPatternDescription(phrase.pattern) : 'Connecting Phrase'}
+          </span>
+          <div className="connector-line"></div>
+        </div>
+      )}
+
+      <div className="tab-phrase">
+        {/* Chord name and pattern info */}
+        <div className="phrase-header">
+          <strong>{phrase.chordName}</strong>
+          {phrase.pattern && position === 'standalone' && (
+            <span className="pattern-info">({getPatternDescription(phrase.pattern)})</span>
+          )}
+        </div>
+
+        <div className="tab-staff">
+          {/* String labels (tuning) */}
+          <div className="string-labels">
+            {tuning.map((note, stringIndex) => (
+              <div key={stringIndex} className="string-label">
+                {note}
+              </div>
+            ))}
           </div>
 
-          <div className="tab-staff">
-            {/* String labels (tuning) */}
-            <div className="string-labels">
-              {tuning.map((note, stringIndex) => (
-                <div key={stringIndex} className="string-label">
-                  {note}
+          {/* Tab lines with fret numbers */}
+          <div className="tab-lines">
+            {tuning.map((note, stringIndex) => (
+              <div key={stringIndex} className="tab-line">
+                <div className="line-border"></div>
+                <div className="fret-numbers">
+                  {phrase.notes
+                    .filter((tabNote) => tabNote.string === stringIndex)
+                    .map((tabNote, noteIndex) => (
+                      <span key={noteIndex} className="fret-number">
+                        {tabNote.fret}
+                      </span>
+                    ))}
                 </div>
-              ))}
-            </div>
-
-            {/* Tab lines with fret numbers */}
-            <div className="tab-lines">
-              {tuning.map((note, stringIndex) => (
-                <div key={stringIndex} className="tab-line">
-                  <div className="line-border"></div>
-                  <div className="fret-numbers">
-                    {phrase.notes
-                      .filter((tabNote) => tabNote.string === stringIndex)
-                      .map((tabNote, noteIndex) => (
-                        <span key={noteIndex} className="fret-number">
-                          {tabNote.fret}
-                        </span>
-                      ))}
-                  </div>
-                </div>
-              ))}
-            </div>
+              </div>
+            ))}
           </div>
         </div>
-      ))}
+      </div>
     </div>
   );
 };
@@ -91,6 +125,7 @@ export const createPlaceholderTabData = () => {
   return [
     {
       chordName: 'C Major',
+      pattern: 'arpeggiated',
       notes: [
         { string: 0, fret: 0 }, // High E string, open
         { string: 1, fret: 1 }, // B string, 1st fret
@@ -102,6 +137,7 @@ export const createPlaceholderTabData = () => {
     },
     {
       chordName: 'G Major',
+      pattern: 'ascending-run',
       notes: [
         { string: 0, fret: 3 }, // High E string, 3rd fret
         { string: 1, fret: 0 }, // B string, open
@@ -113,6 +149,7 @@ export const createPlaceholderTabData = () => {
     },
     {
       chordName: 'Am',
+      pattern: 'descending-run',
       notes: [
         { string: 0, fret: 0 }, // High E string, open
         { string: 1, fret: 1 }, // B string, 1st fret
@@ -124,6 +161,7 @@ export const createPlaceholderTabData = () => {
     },
     {
       chordName: 'F Major',
+      pattern: 'mixed',
       notes: [
         { string: 0, fret: 1 }, // High E string, 1st fret
         { string: 1, fret: 1 }, // B string, 1st fret
@@ -137,3 +175,17 @@ export const createPlaceholderTabData = () => {
 };
 
 export default TabDisplay;
+/**
+ * Creates a single placeholder tab phrase for testing
+ * @param {string} chordName - Name of the chord
+ * @param {'ascending-run' | 'descending-run' | 'arpeggiated' | 'mixed'} pattern - Pattern type
+ * @returns {TabPhrase} Single tab phrase
+ */
+export const createSingleTabPhrase = (chordName = 'C Major', pattern = 'arpeggiated') => {
+  const phrases = createPlaceholderTabData();
+  const phrase = phrases.find((p) => p.chordName === chordName) || phrases[0];
+  return {
+    ...phrase,
+    pattern,
+  };
+};

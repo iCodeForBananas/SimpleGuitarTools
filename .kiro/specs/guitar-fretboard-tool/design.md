@@ -49,6 +49,23 @@ graph TB
 - **Fretboard**: Reusable fretboard visualization component
 - **ControlPanel**: Collection of input controls for user interaction
 - **TabDisplay**: Component for rendering guitar tablature notation
+- **ProgressionDisplay**: Container for chord progression with interspersed tab phrases
+
+### Layout Design for Musical Phrases
+
+The application uses a sequential layout pattern for chord progressions with integrated musical phrases:
+
+```
+[Chord 1 Fretboard]
+[Tab Phrase 1→2]
+[Chord 2 Fretboard]
+[Tab Phrase 2→3]
+[Chord 3 Fretboard]
+[Tab Phrase 3→4]
+[Chord 4 Fretboard]
+```
+
+This design ensures that musical phrases serve as connecting elements between chord changes, providing smooth melodic transitions that guitarists can practice to improve their improvisation skills.
 
 ## Components and Interfaces
 
@@ -91,14 +108,16 @@ interface FretboardProps {
 
 ```typescript
 interface TabDisplayProps {
-  phrases: TabPhrase[];
+  phrase: TabPhrase;
   tuning: string[];
   theme: 'light' | 'dark';
+  position: 'between-chords' | 'standalone';
 }
 
 interface TabPhrase {
   chordName: string;
   notes: TabNote[];
+  pattern: 'ascending-run' | 'descending-run' | 'arpeggiated' | 'mixed';
 }
 
 interface TabNote {
@@ -137,12 +156,14 @@ interface ProgressionFormula {
 ```typescript
 interface TabGenerator {
   generatePhrase(chordNotes: string[], scaleNotes: string[], tuning: string[], options: GenerationOptions): TabPhrase;
+  generateConnectingPhrase(fromChord: string[], toChord: string[], scaleNotes: string[], tuning: string[]): TabPhrase;
 }
 
 interface GenerationOptions {
-  phraseLength: number; // 4-8 notes
+  phraseLength: number; // 4-12 notes for longer melodic runs
   preferredPosition: number; // fret position
   emphasizeChordTones: boolean;
+  patternType: 'ascending-run' | 'descending-run' | 'arpeggiated' | 'mixed';
   rhythmPattern?: string;
 }
 ```
@@ -173,7 +194,7 @@ const chordFormulas = {
 
 #### Scale System
 
-```typescript
+````typescript
 const scaleFormulas = {
   'Major': [0, 2, 4, 5, 7, 9, 11],
   'Minor': [0, 2, 3, 5, 7, 8, 10],
@@ -185,7 +206,35 @@ const scaleFormulas = {
   'Phrygian': [0, 1, 3, 5, 7, 8, 10],
   'Phrygian Dominant': [0, 1, 4, 5, 7, 8, 10],
 };
-```
+
+#### Musical Phrase Patterns
+
+```typescript
+const phrasePatterns = {
+  'ascending-run': {
+    description: 'Ascending scale passages with position shifts',
+    example: 'E|-----0-1-3-5---0-1-3-5---',
+    algorithm: 'generateAscendingRun',
+  },
+  'descending-run': {
+    description: 'Descending melodic lines emphasizing chord tones',
+    example: 'G|---------0---1-2---2-1-0-',
+    algorithm: 'generateDescendingRun',
+  },
+  'arpeggiated': {
+    description: 'Broken chord patterns across multiple strings',
+    example: 'Mixed string arpeggiation with connecting notes',
+    algorithm: 'generateArpeggiatedPhrase',
+  },
+  'mixed': {
+    description: 'Combination of scalar and arpeggiated elements',
+    example: 'Contextual phrases based on chord progression',
+    algorithm: 'generateMixedPhrase',
+  },
+};
+````
+
+````
 
 ### State Management
 
@@ -210,8 +259,9 @@ interface AppState {
 
   // Generated Content
   generatedTabs: Map<string, TabPhrase>;
+  connectingPhrases: TabPhrase[]; // Phrases positioned between chords
 }
-```
+````
 
 #### Persistence Strategy
 
@@ -342,3 +392,40 @@ interface ThemeContext {
 - **Color Contrast**: WCAG AA compliant contrast ratios for all text and highlights
 - **Color Independence**: Ensure functionality doesn't rely solely on color
 - **Scalable Text**: Support for browser zoom up to 200%
+
+## Clean Interface Design
+
+### Live-Only Content Strategy
+
+The application follows a "live-only" design philosophy that eliminates static demo content and focuses entirely on interactive functionality:
+
+#### Content Principles
+
+- **No Static Demos**: All displayed content must be generated from user interactions
+- **Immediate Feedback**: Every control provides instant visual feedback on fretboards
+- **Functional Focus**: Interface elements serve specific musical learning purposes
+- **Clean State**: Default state shows neutral fretboards ready for user input
+
+#### Interface Organization
+
+```typescript
+interface CleanInterfaceLayout {
+  controlPanel: {
+    tuningControls: TuningSelector[];
+    musicTheorySelectors: ChordScaleSelector[];
+    progressionBuilder: ProgressionControls[];
+    utilityControls: ResetButton | ThemeToggle[];
+  };
+  displayArea: {
+    mainFretboard?: Fretboard; // Only when single chord/scale selected
+    progressionSequence?: ProgressionDisplay; // Only when progression active
+    tabPhrases?: TabDisplay[]; // Only when phrases generated
+  };
+}
+```
+
+#### Dynamic Content Rules
+
+- **Conditional Rendering**: Components only render when relevant to current user selections
+- **Progressive Disclosure**: Advanced features appear only when prerequisite selections are made
+- **State-Driven Display**: All visual content derives from application state, not hardcoded examples
