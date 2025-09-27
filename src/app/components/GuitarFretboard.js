@@ -196,28 +196,17 @@ const GuitarFretboard = () => {
   };
 
   const generateTabs = () => {
-    // Only generate tabs if we have a chord progression and scale
-    const validChords = chordProgression.filter((chord) => chord.name && chords[chord.name]);
-    if (validChords.length === 0 || !scale || !scales[scale]) {
+    if (!chord || !chords[chord]) {
       setGeneratedTabs([]);
       return;
     }
 
-    // Prepare chord progression data for TabGenerator
-    const progressionData = validChords.map((chord) => ({
-      name: chord.name,
-      notes: chords[chord.name],
-    }));
-
-    // Generate phrases using TabGenerator
-    const phrases = tabGenerator.generateProgressionPhrases(progressionData, scales[scale], tuning, {
+    const phrase = tabGenerator.generatePhrase(chord, chords[chord], [], tuning, {
       phraseLength: 6,
       preferredPosition: 5,
-      emphasizeChordTones: true,
-      positionRange: 4,
     });
 
-    setGeneratedTabs(phrases);
+    setGeneratedTabs([phrase]);
   };
 
   const chordOptions = useReactMemo(
@@ -334,10 +323,10 @@ const GuitarFretboard = () => {
           <button
             className="btn btn-primary btn-sm mt-2"
             onClick={generateTabs}
-            disabled={!scale || chordProgression.every((chord) => !chord.name)}
-            title="Generate musical phrases for the chord progression"
+            disabled={!chord}
+            title="Generate arpeggiated phrase for selected chord"
           >
-            Generate Tabs
+            Generate Arpeggio
           </button>
           <button
             className={`btn ${theme === 'light' ? 'btn-outline-danger' : 'btn-outline-light'} btn-sm mt-2`}
@@ -377,7 +366,7 @@ const GuitarFretboard = () => {
 
       {generatedTabs.length > 0 && (
         <div className="mt-4">
-          <h5 className="mb-3">Generated Musical Phrases</h5>
+          <h5 className="mb-3">Generated Arpeggio</h5>
           <TabDisplay phrases={generatedTabs} tuning={tuning} />
         </div>
       )}

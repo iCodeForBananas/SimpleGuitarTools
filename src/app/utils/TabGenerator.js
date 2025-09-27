@@ -166,50 +166,18 @@ class TabGenerator {
   }
 
   /**
-   * Create a melodic sequence of notes from a scale, emphasizing chord tones
-   * @param {string[]} scaleNotes - Available scale notes
+   * Create an arpeggiated sequence from chord notes
    * @param {string[]} chordNotes - Current chord notes
    * @param {number} length - Number of notes to generate
-   * @param {boolean} emphasizeChordTones - Whether to prioritize chord tones
    * @returns {string[]} Array of note names
    */
-  createMelodicSequence(scaleNotes, chordNotes, length, emphasizeChordTones) {
-    if (scaleNotes.length === 0) return [];
+  createArpeggiatedSequence(chordNotes, length) {
+    if (chordNotes.length === 0) return [];
 
     const sequence = [];
-    const availableNotes = [...scaleNotes];
-
-    // Create weighted note selection based on chord tones
-    const weightedNotes = [];
-    availableNotes.forEach((note) => {
-      const isChordTone = chordNotes.includes(note);
-      const weight = emphasizeChordTones && isChordTone ? 3 : 1;
-
-      for (let i = 0; i < weight; i++) {
-        weightedNotes.push(note);
-      }
-    });
-
-    // Generate sequence with some melodic logic
     for (let i = 0; i < length; i++) {
-      let selectedNote;
-
-      if (i === 0 || i === length - 1) {
-        // Start and end with chord tones if possible
-        const chordTonesInScale = chordNotes.filter((note) => scaleNotes.includes(note));
-        if (chordTonesInScale.length > 0) {
-          selectedNote = chordTonesInScale[Math.floor(Math.random() * chordTonesInScale.length)];
-        } else {
-          selectedNote = weightedNotes[Math.floor(Math.random() * weightedNotes.length)];
-        }
-      } else {
-        // Middle notes can be any scale note
-        selectedNote = weightedNotes[Math.floor(Math.random() * weightedNotes.length)];
-      }
-
-      sequence.push(selectedNote);
+      sequence.push(chordNotes[i % chordNotes.length]);
     }
-
     return sequence;
   }
 
@@ -232,13 +200,8 @@ class TabGenerator {
       return { chordName, notes: [] };
     }
 
-    // Generate melodic sequence
-    const noteSequence = this.createMelodicSequence(
-      workingScale,
-      chordNotes,
-      opts.phraseLength,
-      opts.emphasizeChordTones,
-    );
+    // Generate arpeggiated sequence
+    const noteSequence = this.createArpeggiatedSequence(chordNotes, opts.phraseLength);
 
     // Convert notes to fretboard positions
     const tabNotes = [];

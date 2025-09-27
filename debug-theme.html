@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Theme Debug</title>
+    <style>
+        /* Light theme (default) */
+        :root {
+          --bg-primary: #ffffff;
+          --text-primary: #212529;
+        }
+
+        /* Dark theme */
+        [data-theme='dark'] {
+          --bg-primary: #1a1a1a;
+          --text-primary: #ffffff;
+        }
+
+        body {
+          background: var(--bg-primary);
+          color: var(--text-primary);
+          transition: background-color 0.3s ease, color 0.3s ease;
+          padding: 20px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Theme Test</h1>
+    <button onclick="toggleTheme()">Toggle Theme</button>
+    <p>Current theme: <span id="current-theme">light</span></p>
+    
+    <script>
+        function toggleTheme() {
+            const html = document.documentElement;
+            const currentTheme = html.getAttribute('data-theme') || 'light';
+            const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+            
+            html.setAttribute('data-theme', newTheme);
+            document.getElementById('current-theme').textContent = newTheme;
+            
+            console.log('Theme changed to:', newTheme);
+            console.log('data-theme attribute:', html.getAttribute('data-theme'));
+        }
+    </script>
+</body>
+</html>
