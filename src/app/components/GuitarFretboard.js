@@ -4,8 +4,6 @@ import React, { useState, useMemo, useMemo as useReactMemo } from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './fretboard.css';
 import { useTheme } from '../contexts/ThemeContext';
-import TabGenerator from '../utils/TabGenerator';
-import TabDisplay from './TabDisplay';
 
 const allNotes = ['A', 'A#', 'B', 'C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#'];
 
@@ -117,10 +115,7 @@ const GuitarFretboard = () => {
     { name: '', fret: 0 },
     { name: '', fret: 0 },
   ]);
-  const [generatedTabs, setGeneratedTabs] = useState([]);
 
-  // Initialize TabGenerator
-  const tabGenerator = useMemo(() => new TabGenerator(), []);
 
   const updateTuning = (index, value) => {
     const newTuning = [...tuning];
@@ -153,8 +148,6 @@ const GuitarFretboard = () => {
       { name: '', fret: 0 },
       { name: '', fret: 0 },
     ]);
-    // Clear generated tabs
-    setGeneratedTabs([]);
   };
 
   const generateProgression = () => {
@@ -195,19 +188,7 @@ const GuitarFretboard = () => {
     setChordProgression(progression);
   };
 
-  const generateTabs = () => {
-    if (!chord || !chords[chord]) {
-      setGeneratedTabs([]);
-      return;
-    }
 
-    const phrase = tabGenerator.generatePhrase(chord, chords[chord], [], tuning, {
-      phraseLength: 6,
-      preferredPosition: 5,
-    });
-
-    setGeneratedTabs([phrase]);
-  };
 
   const chordOptions = useReactMemo(
     () =>
@@ -320,14 +301,7 @@ const GuitarFretboard = () => {
           <button className="btn btn-secondary btn-sm mt-2" onClick={generateProgression}>
             Generate Random Progression
           </button>
-          <button
-            className="btn btn-primary btn-sm mt-2"
-            onClick={generateTabs}
-            disabled={!chord}
-            title="Generate arpeggiated phrase for selected chord"
-          >
-            Generate Arpeggio
-          </button>
+
           <button
             className={`btn ${theme === 'light' ? 'btn-outline-danger' : 'btn-outline-light'} btn-sm mt-2`}
             onClick={resetToDefaults}
@@ -363,13 +337,6 @@ const GuitarFretboard = () => {
           />
         ))}
       </div>
-
-      {generatedTabs.length > 0 && (
-        <div className="mt-4">
-          <h5 className="mb-3">Generated Arpeggio</h5>
-          <TabDisplay phrases={generatedTabs} tuning={tuning} />
-        </div>
-      )}
     </div>
   );
 };
