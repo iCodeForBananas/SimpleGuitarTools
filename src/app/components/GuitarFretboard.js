@@ -104,50 +104,107 @@ const Fretboard = ({ tuning, totalFrets, chordName, chordNotes, scaleNotes = [],
 const GuitarFretboard = () => {
   const { theme, toggleTheme, mounted } = useTheme();
   const { chords, scales } = useMemo(() => generateChordsAndScales(), []);
-  const [progressionKey, setProgressionKey] = useState('C');
-  const [tuning, setTuning] = useState([...defaultTuning]);
-  const [chord, setChord] = useState('');
-  const [scale, setScale] = useState('');
-  const [formulaIndex, setFormulaIndex] = useState(0);
-  const [chordProgression, setChordProgression] = useState([
-    { name: '', fret: 0 },
-    { name: '', fret: 0 },
-    { name: '', fret: 0 },
-    { name: '', fret: 0 },
-  ]);
+  
+  // Load from localStorage or use defaults
+  const [progressionKey, setProgressionKey] = useState(() => {
+    if (typeof window !== 'undefined') {
+      return localStorage.getItem('guitar-progressionKey') || 'C';
+    }
+    return 'C';
+  });
+  
+  const [tuning, setTuning] = useState(() => {
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem('guitar-tuning');
+      return saved ? JSON.parse(saved) : [...defaultTuning];
+    }
+    return [...defaultTuning];
+  });
+  
+  const [chord, setChord] = useState(() => {
+    if (typeof window !== 'undefined') {
+      return localStorage.getItem('guitar-chord') || '';
+    }
+    return '';
+  });
+  
+  const [scale, setScale] = useState(() => {
+    if (typeof window !== 'undefined') {
+      return localStorage.getItem('guitar-scale') || '';
+    }
+    return '';
+  });
+  
+  const [formulaIndex, setFormulaIndex] = useState(() => {
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem('guitar-formulaIndex');
+      return saved ? parseInt(saved, 10) : 0;
+    }
+    return 0;
+  });
+  
+  const [chordProgression, setChordProgression] = useState(() => {
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem('guitar-chordProgression');
+      return saved ? JSON.parse(saved) : [
+        { name: '', fret: 0 },
+        { name: '', fret: 0 },
+        { name: '', fret: 0 },
+        { name: '', fret: 0 },
+      ];
+    }
+    return [
+      { name: '', fret: 0 },
+      { name: '', fret: 0 },
+      { name: '', fret: 0 },
+      { name: '', fret: 0 },
+    ];
+  });
 
 
   const updateTuning = (index, value) => {
     const newTuning = [...tuning];
     newTuning[index] = value;
     setTuning(newTuning);
+    localStorage.setItem('guitar-tuning', JSON.stringify(newTuning));
   };
 
   const updateChordInProgression = (index, field, value) => {
     const updated = [...chordProgression];
     updated[index] = { ...updated[index], [field]: field === 'fret' ? parseInt(value, 10) || 0 : value };
     setChordProgression(updated);
+    localStorage.setItem('guitar-chordProgression', JSON.stringify(updated));
   };
 
-  const resetTuning = () => setTuning([...defaultTuning]);
+  const resetTuning = () => {
+    setTuning([...defaultTuning]);
+    localStorage.setItem('guitar-tuning', JSON.stringify([...defaultTuning]));
+  };
 
   const resetToDefaults = () => {
     // Reset tuning to standard
     setTuning([...defaultTuning]);
+    localStorage.setItem('guitar-tuning', JSON.stringify([...defaultTuning]));
     // Clear chord and scale selections
     setChord('');
+    localStorage.setItem('guitar-chord', '');
     setScale('');
+    localStorage.setItem('guitar-scale', '');
     // Reset progression key to C
     setProgressionKey('C');
+    localStorage.setItem('guitar-progressionKey', 'C');
     // Reset formula index to first option
     setFormulaIndex(0);
+    localStorage.setItem('guitar-formulaIndex', '0');
     // Clear chord progression selections
-    setChordProgression([
+    const defaultProgression = [
       { name: '', fret: 0 },
       { name: '', fret: 0 },
       { name: '', fret: 0 },
       { name: '', fret: 0 },
-    ]);
+    ];
+    setChordProgression(defaultProgression);
+    localStorage.setItem('guitar-chordProgression', JSON.stringify(defaultProgression));
   };
 
   const generateProgression = () => {
@@ -186,6 +243,7 @@ const GuitarFretboard = () => {
       return { name: chordName, fret: 0 };
     });
     setChordProgression(progression);
+    localStorage.setItem('guitar-chordProgression', JSON.stringify(progression));
   };
 
 
@@ -254,11 +312,17 @@ const GuitarFretboard = () => {
 
         <div className="col">
           <h5>Chords & Scales</h5>
-          <select className="form-select mb-3" value={chord} onChange={(e) => setChord(e.target.value)}>
+          <select className="form-select mb-3" value={chord} onChange={(e) => {
+            setChord(e.target.value);
+            localStorage.setItem('guitar-chord', e.target.value);
+          }}>
             <option value="">-- Select Chord --</option>
             {chordOptions}
           </select>
-          <select className="form-select mb-3" value={scale} onChange={(e) => setScale(e.target.value)}>
+          <select className="form-select mb-3" value={scale} onChange={(e) => {
+            setScale(e.target.value);
+            localStorage.setItem('guitar-scale', e.target.value);
+          }}>
             <option value="">-- Select Scale --</option>
             {scaleOptions}
           </select>
@@ -269,7 +333,10 @@ const GuitarFretboard = () => {
           <select
             className="form-select mb-3"
             value={progressionKey}
-            onChange={(e) => setProgressionKey(e.target.value)}
+            onChange={(e) => {
+              setProgressionKey(e.target.value);
+              localStorage.setItem('guitar-progressionKey', e.target.value);
+            }}
           >
             {allNotes.map((note) => (
               <option key={note} value={note}>{`Key of ${note}`}</option>
@@ -278,7 +345,11 @@ const GuitarFretboard = () => {
           <select
             className="form-select mb-3"
             value={formulaIndex}
-            onChange={(e) => setFormulaIndex(parseInt(e.target.value, 10))}
+            onChange={(e) => {
+              const value = parseInt(e.target.value, 10);
+              setFormulaIndex(value);
+              localStorage.setItem('guitar-formulaIndex', value.toString());
+            }}
           >
             {progressionFormulas.map((formula, idx) => (
               <option key={idx} value={idx}>
