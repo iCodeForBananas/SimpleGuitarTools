@@ -20,7 +20,21 @@ const progressionFormulas = [
   { label: 'Melancholy Minor: i – VII – VI – iv', pattern: [0, 10, 8, 5], isMinor: true },
   { label: 'Dramatic Minor: i – v – VI – III', pattern: [0, 7, 8, 3], isMinor: true },
   { label: 'Spanish: i – VII – VI – V', pattern: [0, 10, 8, 7], isMinor: true },
-  { label: 'Spanish Romantic: i – VII – VI – V', pattern: [0, 10, 8, 7], isMinor: true },
+  { label: 'Jazz: ii – V – I – vi', pattern: [2, 7, 0, 9], isMinor: false },
+  { label: 'Blues: I – IV – I – V', pattern: [0, 5, 0, 7], isMinor: false },
+  { label: 'Country: I – V – vi – iii', pattern: [0, 7, 9, 4], isMinor: false },
+  { label: 'Reggae: vi – IV – I – V', pattern: [9, 5, 0, 7], isMinor: false },
+  { label: 'Punk: I – V – vi – IV', pattern: [0, 7, 9, 5], isMinor: false },
+  { label: 'Metal: i – VI – VII – i', pattern: [0, 8, 10, 0], isMinor: true },
+  { label: 'Grunge: i – III – VII – VI', pattern: [0, 3, 10, 8], isMinor: true },
+  { label: 'R&B: vi – ii – V – I', pattern: [9, 2, 7, 0], isMinor: false },
+  { label: 'Gospel: I – vi – ii – V', pattern: [0, 9, 2, 7], isMinor: false },
+  { label: 'Funk: i – iv – VII – i', pattern: [0, 5, 10, 0], isMinor: true },
+  { label: 'Bossa Nova: ii – V – I – VI', pattern: [2, 7, 0, 8], isMinor: false },
+  { label: 'Celtic: i – VII – VI – VII', pattern: [0, 10, 8, 10], isMinor: true },
+  { label: 'Ambient: I – V – vi – iii', pattern: [0, 7, 9, 4], isMinor: false },
+  { label: 'Trap: i – VI – iv – V', pattern: [0, 8, 5, 7], isMinor: true },
+  { label: 'House: vi – IV – I – V', pattern: [9, 5, 0, 7], isMinor: false },
 ];
 
 const generateChordsAndScales = () => {
